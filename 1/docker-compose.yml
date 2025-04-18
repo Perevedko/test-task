@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+  app:
+    build: .
+    environment:
+      DB_HOST: db
+      DB_NAME: app_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    working_dir: /app
+    volumes:
+      - ./:/app
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
