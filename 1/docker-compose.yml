@@ -15,10 +15,12 @@ services:
     build: .
     environment:
       DB_HOST: db
-      DB_NAME: app_db
+      DB_NAME: postgres
       DB_USER: postgres
       DB_PASSWORD: postgres
     working_dir: /app
+    depends_on:
+      - db
     volumes:
       - ./:/app
     networks:
