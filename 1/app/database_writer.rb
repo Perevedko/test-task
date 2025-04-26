@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require_relative 'database_helper'
+require_relative './database_helper'
 
 module App
   class DatabaseWriter
@@ -19,13 +19,9 @@ module App
     end
 
     def flush
-      values = rows.map do |row|
-        "(#{row.map { connection.escape(_1) }.join(',')})"
-      end
-
       connection.exec <<~SQL
-        INSERT INTO transactions (time_stamp, transaction_id, user_id, amount)
-        VALUES #{values.join(',')};
+        INSERT INTO #{TABLE_NAME} (#{COLUMN_ORDER_IN_CSV.join(',')})
+        VALUES #{values_to_insert};
       SQL
       rows = []
     end
@@ -33,6 +29,12 @@ module App
     private
 
     attr_accessor :rows
+
+    def values_to_insert
+      rows
+        .map { |row| "(#{row.map { connection.escape(_1) }.join(',')})" }
+        .join(',')
+    end
 
     def init_db
       connection.exec <<~SQL

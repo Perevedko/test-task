@@ -1,7 +1,13 @@
 # frozen_string_literal: true
+require_relative './database_helper'
 
 module App
   class DatabaseReader
+    include DatabaseHelper
+
+    CURSOR_NAME = "#{TABLE_NAME}_cursor"
+    private_constant :CURSOR_NAME
+
     attr_reader :batch_size
 
     def initialize(batch_size:)
@@ -10,39 +16,36 @@ module App
 
     def read
       connection.transaction do
-        connection.exec <<~SQL
-          DECLARE #{cursor_name} CURSOR FOR
-          SELECT * FROM transactions ORDER BY amount::MONEY DESC
-        SQL
+        init_cursor
 
         loop do
-          batch = connection.exec("FETCH FORWARD #{batch_size} FROM #{cursor_name}")
+          batch = connection.exec("FETCH FORWARD #{batch_size} FROM #{CURSOR_NAME}")
           break if batch.ntuples == 0
 
           batch.each do |row|
-            yield [row['time_stamp'], row['transaction_id'], row['user_id'], row['amount']].join(',')
+            csv_row = row.values_at(*COLUMN_ORDER_IN_CSV).join(',')
+            yield "#{csv_row}\n"
           end
         end
 
-        connection.exec("CLOSE #{cursor_name}")
-        cleanup_db
+        cleanup
       end
     end
 
     private
 
-    def cleanup_db
+    def init_cursor
       connection.exec <<~SQL
-        DROP TABLE IF EXISTS transactions;
+          DECLARE #{CURSOR_NAME} CURSOR FOR
+          SELECT * FROM #{TABLE_NAME} ORDER BY amount::MONEY DESC
       SQL
     end
 
-    def connection
-      @connection ||= Database.instance.connection
-    end
-
-    def cursor_name
-      'transactions_cursor'
+    def cleanup
+      connection.exec <<~SQL
+        CLOSE #{CURSOR_NAME};
+        DROP TABLE IF EXISTS #{TABLE_NAME};
+      SQL
     end
   end
 end

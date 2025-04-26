@@ -2,11 +2,11 @@
 
 module App
   module DatabaseHelper
-    private
+    COLUMN_ORDER_IN_CSV = %w[time_stamp transaction_id user_id amount]
+    TABLE_NAME = 'transactions'
+    private_constant :COLUMN_ORDER_IN_CSV, :TABLE_NAME
 
-    def table_name
-      'transactions'
-    end
+    private
 
     def connection
       @connection ||= Database.instance.connection
