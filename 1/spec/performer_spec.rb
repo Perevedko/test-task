@@ -110,7 +110,7 @@ RSpec.describe App::Performer do
         expect(writer_double).to receive(:add).with(%w[2023-01-02 T2 U2 200]).ordered
         expect(writer_double).to receive(:flush).ordered
 
-        allow(reader_double).to receive(:read) do |&block|
+        expect(reader_double).to receive(:read) do |&block|
           %w[2023-01-02,T2,U2,200 2023-01-01,T1,U1,100].each(&block)
         end
 
