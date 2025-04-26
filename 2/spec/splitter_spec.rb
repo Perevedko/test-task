@@ -3,9 +3,10 @@ require_relative '../word_splitter'
 
 RSpec.describe WordSplitter do
   let(:splitter) { WordSplitter.new(dictionary) }
-  subject { splitter.can_split?(string) }
 
   describe '#can_split?' do
+    subject { splitter.can_split?(string) }
+
     def self.test_case
       it { is_expected.to eq(expected_result) }
     end
@@ -14,6 +15,7 @@ RSpec.describe WordSplitter do
       let(:dictionary) { %w[две сотни тысячи] }
       let(:string) { 'двесотни' }
       let(:expected_result) { true }
+
       test_case
     end
 
@@ -21,6 +23,7 @@ RSpec.describe WordSplitter do
       let(:dictionary) { %w[две тысячи] }
       let(:string) { 'двесотни' }
       let(:expected_result) { false }
+
       test_case
     end
 
@@ -28,6 +31,7 @@ RSpec.describe WordSplitter do
       let(:dictionary) { [] }
       let(:string) { '' }
       let(:expected_result) { true }
+
       test_case
     end
 
@@ -35,6 +39,7 @@ RSpec.describe WordSplitter do
       let(:dictionary) { ['apple'] }
       let(:string) { 'apple' }
       let(:expected_result) { true }
+
       test_case
     end
 
@@ -42,6 +47,7 @@ RSpec.describe WordSplitter do
       let(:dictionary) { ['banana'] }
       let(:string) { 'apple' }
       let(:expected_result) { false }
+
       test_case
     end
 
@@ -49,6 +55,7 @@ RSpec.describe WordSplitter do
       let(:dictionary) { %w[apple pen applepen] }
       let(:string) { 'applepenapple' }
       let(:expected_result) { true }
+
       test_case
     end
 
@@ -56,6 +63,7 @@ RSpec.describe WordSplitter do
       let(:dictionary) { ['две', 'сот'] }
       let(:string) { 'двесотни' }
       let(:expected_result) { false }
+
       test_case
     end
   end
